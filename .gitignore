@@ -1,0 +1,42 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases and database backups (never commit data)
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.backup
+backups/
+pgdata/
+
+# Logs and temporary files
+logs/
+*.log
+tmp/
+temp/
+*.tmp
+
+# IDE and OS configuration
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Generated artifacts that may contain sensitive data
+reports/
+exports/
