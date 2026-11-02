@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Edit note · CloudNotes{% endblock %}
+{% block content %}
+<section class="page-header">
+  <h1>Edit note</h1>
+  <span class="muted small">Last updated {{ note.updated_at|timestamp }}</span>
+</section>
+
+<form class="note-form" method="post" action="{{ url_for('notes.update_note', note_id=note.id) }}" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% include "_note_fields.html" %}
+  <div class="form-actions">
+    <a class="button" href="{{ url_for('notes.view_note', note_id=note.id) }}">Cancel</a>
+    <button type="submit" class="button button-primary" data-loading-text="Saving&hellip;">Save changes</button>
+  </div>
+</form>
+{% endblock %}

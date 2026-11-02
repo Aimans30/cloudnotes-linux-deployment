@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}All notes · CloudNotes{% endblock %}
+{% block content %}
+<section class="page-header">
+  <h1>Your notes</h1>
+  <span class="muted">{{ notes|length }} saved</span>
+</section>
+
+{% if notes %}
+<ul class="note-list">
+  {% for note in notes %}
+  <li class="note-card">
+    <div class="note-card-body">
+      <a class="note-title" href="{{ url_for('notes.view_note', note_id=note.id) }}">{{ note.title }}</a>
+      <p class="note-excerpt">{{ note.content[:140] }}{% if note.content|length > 140 %}&hellip;{% endif %}</p>
+      <time class="muted small" datetime="{{ note.updated_at.isoformat() }}">Updated {{ note.updated_at|timestamp }}</time>
+    </div>
+    <div class="note-card-actions">
+      <a class="button" href="{{ url_for('notes.edit_note', note_id=note.id) }}">Edit</a>
+      <form method="post" action="{{ url_for('notes.delete_note', note_id=note.id) }}"
+            data-confirm="Delete &quot;{{ note.title }}&quot;? This cannot be undone.">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="button button-danger" data-loading-text="Deleting&hellip;">Delete</button>
+      </form>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="empty-state">
+  <h2>No notes yet</h2>
+  <p class="muted">Capture an idea, a to-do list, or anything worth keeping.</p>
+  <a class="button button-primary" href="{{ url_for('notes.new_note') }}">Create your first note</a>
+</div>
+{% endif %}
+{% endblock %}
