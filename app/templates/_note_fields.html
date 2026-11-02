@@ -1,0 +1,14 @@
+{# Shared title/content fields for the create and edit forms. #}
+<div class="field {% if errors.get('title') %}has-error{% endif %}">
+  <label for="title">Title</label>
+  <input id="title" name="title" type="text" maxlength="200" required value="{{ form.get('title', '') }}"
+         {% if errors.get('title') %}aria-invalid="true" aria-describedby="title-error"{% endif %}>
+  {% if errors.get('title') %}<p id="title-error" class="field-error">{{ errors['title'] }}</p>{% endif %}
+</div>
+
+<div class="field {% if errors.get('content') %}has-error{% endif %}">
+  <label for="content">Content</label>
+  <textarea id="content" name="content" rows="12" maxlength="10000"
+            {% if errors.get('content') %}aria-invalid="true" aria-describedby="content-error"{% endif %}>{{ form.get('content', '') }}</textarea>
+  {% if errors.get('content') %}<p id="content-error" class="field-error">{{ errors['content'] }}</p>{% endif %}
+</div>

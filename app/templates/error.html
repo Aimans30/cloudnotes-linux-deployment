@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · CloudNotes{% endblock %}
+{% block content %}
+<div class="empty-state error-state" role="alert">
+  <p class="error-code">Error {{ code }}</p>
+  <h1>{{ title }}</h1>
+  <p class="muted">{{ message }}</p>
+  <a class="button button-primary" href="{{ url_for('notes.index') }}">Back to notes</a>
+</div>
+{% endblock %}

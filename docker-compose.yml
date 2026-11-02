@@ -1,0 +1,66 @@
+# CloudNotes stack: Flask/Gunicorn application plus PostgreSQL.
+# All secrets come from .env (see .env.example). Nothing sensitive is hardcoded here.
+# The project name is unique so these containers never collide with other Compose stacks.
+name: cloudnotes-linux
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      # Administrator account, used for setup only.
+      POSTGRES_USER: ${POSTGRES_ADMIN_USER:-cloudnotes_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:?Set POSTGRES_ADMIN_PASSWORD in .env}
+      POSTGRES_DB: cloudnotes
+      # Read by db/init/01-create-app-role.sh to create the non-superuser app role.
+      APP_DB_USER: ${APP_DB_USER:-cloudnotes_user}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?Set APP_DB_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - backend
+    # Deliberately no "ports:" entry: PostgreSQL is reachable only inside Docker.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d cloudnotes"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  app:
+    build: .
+    image: cloudnotes-app:local
+    restart: always
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in .env}
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in .env}
+      FLASK_ENV: ${FLASK_ENV:-production}
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-2}
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - frontend
+      - backend
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys, urllib.request; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=3).status == 200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+networks:
+  # Published to the Windows host so the browser can reach the app.
+  frontend:
+    driver: bridge
+  # Internal only: no route to the outside world. Holds the database traffic.
+  backend:
+    driver: bridge
+    internal: true
+
+volumes:
+  pgdata:
+    name: cloudnotes_linux_pgdata

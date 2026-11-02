@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}New note · CloudNotes{% endblock %}
+{% block content %}
+<section class="page-header">
+  <h1>New note</h1>
+</section>
+
+<form class="note-form" method="post" action="{{ url_for('notes.create_note') }}" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% include "_note_fields.html" %}
+  <div class="form-actions">
+    <a class="button" href="{{ url_for('notes.index') }}">Cancel</a>
+    <button type="submit" class="button button-primary" data-loading-text="Saving&hellip;">Save note</button>
+  </div>
+</form>
+{% endblock %}
